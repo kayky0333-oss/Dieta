@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Alimentar Simples</title>
+    <style>
+        :root {
+            --primary: #2B6CB0;
+            --success: #38A169;
+            --warning: #DD6B20;
+            --bg: #F7FAFC;
+            --card-bg: #FFFFFF;
+            --text: #2D3748;
+            --text-light: #718096;
+            --border: #E2E8F0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 20px; line-height: 1.5; }
+        .container { max-width: 800px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { color: var(--primary); font-size: 24px; margin-bottom: 5px; }
+        h2 { font-size: 18px; margin-bottom: 15px; color: var(--primary); }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        
+        /* Formulários */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 5px; color: var(--text); }
+        input, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; outline: none; }
+        input:focus, select:focus { border-color: var(--primary); }
+        button { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #1A365D; }
+        .btn-secondary { background: var(--text-light); margin-top: 10px; }
+        .btn-secondary:hover { background: #4A5568; }
+
+        /* Dashboard e Barras de Progresso */
+        .grid-macros { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px; }
+        @media(min-width: 600px) { .grid-macros { grid-template-columns: repeat(4, 1fr); } }
+        .macro-box { background: var(--bg); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
+        .macro-box h3 { font-size: 12px; color: var(--text-light); text-transform: uppercase; }
+        .macro-box p { font-size: 18px; font-weight: bold; margin-top: 5px; }
+        
+        .progress-container { margin-bottom: 15px; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 5px; }
+        .progress-bar { background: var(--border); height: 16px; border-radius: 8px; overflow: hidden; }
+        .progress-value { background: var(--primary); height: 100%; width: 0%; transition: width 0.3s; }
+        .calorias .progress-value { background: var(--success); }
+
+        /* Elementos Ocultos/Exibidos */
+        .hidden { display: none !none; }
+        
+        /* Lista de Itens */
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 15px; }
+        .item-row:last-child { border-bottom: none; }
+        .delete-btn { background: none; color: #E53E3E; width: auto; padding: 0 5px; font-size: 14px; cursor: pointer; }
+
+        /* Sugestões */
+        .suggestion-box { background: #EBF8FF; border-left: 4px solid var(--primary); padding: 12px; border-radius: 0 8px 8px 0; margin-top: 10px; font-size: 14px; }
+        .suggestion-box ul { margin-top: 5px; padding-left: 20px; }
+
+        /* Controle de Água */
+        .water-control { display: flex; align-items: center; gap: 10px; }
+        .water-btn { width: auto; padding: 8px 15px; background: #3182CE; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Controle Alimentar</h1>
+        <p id="txt-data-atual"></p>
+    </header>
+
+    <!-- TELA 1: CADASTRO INICIAL -->
+    <div id="secao-cadastro" class="card">
+        <h2>Seus Dados Físicos</h2>
+        <div class="form-group">
+            <label>Peso (kg)</label>
+            <input type="number" id="peso" value="70" step="0.1">
+        </div>
+        <div class="form-group">
+            <label>Altura (cm)</label>
+            <input type="number" id="altura" value="170">
+        </div>
+        <div class="form-group">
+            <label>Idade (anos)</label>
+            <input type="number" id="idade" value="25">
+        </div>
+        <div class="form-group">
+            <label>Sexo</label>
+            <select id="sexo">
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Nível de Atividade Física</label>
+            <select id="atividade">
+                <option value="1.2">Sedentário (Pouco/Nenhum exercício)</option>
+                <option value="1.375">Leve (Exercício leve 1-3 dias/semana)</option>
+                <option value="1.55">Moderado (Exercício moderado 3-5 dias/semana)</option>
+                <option value="1.725">Ativo (Exercício pesado 6-7 dias/semana)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Objetivo</label>
+            <select id="objetivo">
+                <option value="emagrecer">Emagrecer</option>
+                <option value="manter">Manter Peso</option>
+                <option value="ganhar">Ganhar Massa</option>
+            </select>
+        </div>
+        <button onclick="calcularMetas()">Salvar e Calcular</button>
+    </div>
+
+    <!-- TELA 2: DASHBOARD PRINCIPAL -->
+    <div id="secao-dashboard" class="hidden">
+        
+        <!-- Resumo de Metas Calculadas -->
+        <div class="card" style="background: #EDF2F7; font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div><b>Seu IMC:</b> <span id="val-imc">-</span></div>
+            <div><b>TMB:</b> <span id="val-tmb">-</span> kcal</div>
+            <div><b>Gasto Diário (TDEE):</b> <span id="val-tdee">-</span> kcal</div>
+            <div style="cursor:pointer; color:var(--primary); font-weight:bold;" onclick="refazerCadastro()">[Alterar Dados]</div>
+        </div>
+
+        <!-- Consumo do Dia -->
+        <div class="card">
+            <h2>Resumo do Dia</h2>
+            <div class="progress-container calorias">
+                <div class="progress-label">
+                    <span>Calorias Consumidas</span>
+                    <span id="txt-calorias">0 / 0 kcal</span>
+                </div>
+                <div class="progress-bar"><div id="bar-calorias" class="progress-value"></div></div>
+                <div style="font-size: 13px; margin-top: 5px; color: var(--text-light);">Restam: <span id="txt-calorias-restantes">0</span> kcal</div>
+            </div>
+
+            <div class="grid-macros">
+                <div class="macro-box"><h3>Carbos</h3><p id="txt-carb">0g / 0g</p></div>
+                <div class="macro-box"><h3>Prot</h3><p id="txt-prot">0g / 0g</p></div>
+                <div class="macro-box"><h3>Gord</h3><p id="txt-gord">0g / 0g</p></div>
+                <div class="macro-box"><h3>Água</h3><p id="txt-agua">0 ml</p></div>
+            </div>
+
+            <div class="water-control">
+                <button class="water-btn" onclick="adicionarAgua(250)">+ 250ml Água</button>
+                <button class="water-btn" onclick="adicionarAgua(500)">+ 500ml Água</button>
+            </div>
+        </div>
+
+        <!-- Adicionar Alimentos -->
+        <div class="card">
+            <h2>Adicionar Alimento</h2>
+            <div class="form-group">
+                <label>Selecionar Alimento</label>
+                <select id="select-alimento"></select>
+            </div>
+            <div class="form-group">
+                <label>Quantidade consumida (em gramas ou ml)</label>
+                <input type="number" id="qtd-alimento" value="100">
+            </div>
+            <button onclick="adicionarAlimentoDia()">Registrar Alimento</button>
+            
+            <div class="suggestion-box" id="caixa-sugestoes">
+                <b>Sugestão Inteligente:</b> <span id="txt-sugestao">Suas metas estão equilibradas!</span>
+            </div>
+        </div>
+
+        <!-- Alimentos Consumidos Hoje -->
+        <div class="card">
+            <h2>Refeições Registradas Hoje</h2>
+            <div id="lista-refeicoes"></div>
+        </div>
+
+        <!-- Cadastrar Novo Alimento Customizado -->
+        <div class="card">
+            <h2>Cadastrar Novo Alimento no Banco</h2>
+            <div class="form-group"><label>Nome do Alimento</label><input type="text" id="novo-nome" placeholder="Ex: Tapioca"></div>
+            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                <div class="form-group"><label>Kcal (100g)</label><input type="number" id="novo-kcal"></div>
+                <div class="form-group"><label>Carbo (100g)</label><input type="number" id="novo-carb"></div>
+                <div class="form-group"><label>Prot (100g)</label><input type="number" id="novo-prot"></div>
+                <div class="form-group"><label>Gord (100g)</label><input type="number" id="novo-gord"></div>
+            </div>
+            <button class="btn-secondary" onclick="cadastrarAlimentoPersonalizado()">Salvar no Banco de Dados</button>
+        </div>
+
+        <!-- Histórico Rápido -->
+        <div class="card">
+            <h2>Histórico de Dias Anteriores</h2>
+            <div id="lista-historico" style="font-size: 14px;"></div>
+            <button class="btn-secondary" style="background:#E53E3E" onclick="limparTodosDados()">Resetar Todo o Sistema</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Banco de Dados Inicial (Valores a cada 100g ou 100ml)
+    const bancoAlimentosPadrao = [
