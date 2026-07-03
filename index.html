@@ -48,13 +48,12 @@
         .calorias .progress-value { background: var(--success); }
 
         /* Elementos Ocultos/Exibidos */
-        .hidden { display: none !important; } /* Corrigido de '!none' para '!important' */
+        .hidden { display: none !important; }
         
         /* Lista de Itens */
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 15px; }
         .item-row:last-child { border-bottom: none; }
         .delete-btn { background: none; color: #E53E3E; width: auto; padding: 0 5px; font-size: 14px; cursor: pointer; }
-        .delete-btn:hover { text-decoration: underline; }
 
         /* Controle de Água */
         .water-control { display: flex; align-items: center; gap: 10px; }
@@ -152,7 +151,7 @@
             <h2>Adicionar Alimento</h2>
             <div class="form-group">
                 <label>Selecionar Alimento</label>
-                <select id="select-alimento"></select>
+                <select id="select-alimento"></select> <!-- Fechado Corretamente Aqui -->
             </div>
             <div class="form-group">
                 <label>Quantidade consumida (em gramas)</label>
@@ -161,37 +160,30 @@
             <button onclick="adicionarAlimentoDia()">Registrar Alimento</button>
         </div>
 
-        <!-- Lista de Alimentos Consumidos -->
+        <!-- Lista de Consumo -->
         <div class="card">
             <h2>Alimentos Consumidos Hoje</h2>
-            <div id="lista-consumo">
-                <!-- Itens entram aqui via JS -->
-            </div>
+            <div id="lista-consumo"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // Banco de dados interno simplificado (Valores para cada 100g de alimento)
     const tabelaAlimentos = [
         { id: 1, nome: "Arroz Integral Cozido", cal: 112, carb: 24, prot: 2.6, gord: 0.5 },
         { id: 2, nome: "Feijão Carioca Cozido", cal: 76, carb: 14, prot: 4.8, gord: 0.5 },
         { id: 3, nome: "Peito de Frango Grelhado", cal: 159, carb: 0, prot: 32, gord: 2.5 },
         { id: 4, nome: "Ovo Cozido (Unidade ~50g)", cal: 78, carb: 0.6, prot: 6, gord: 5 },
         { id: 5, nome: "Banana Prata", cal: 89, carb: 23, prot: 1.3, gord: 0.3 },
-        { id: 6, nome: "Pão de Forma Integral (Fatia)", cal: 60, carb: 11, prot: 2.5, gord: 0.5 },
-        { id: 7, nome: "Azeite de Oliva (Colher de sopa)", cal: 119, carb: 0, prot: 0, gord: 14 }
+        { id: 6, nome: "Pão de Forma Integral (Fatia)", cal: 60, carb: 11, prot: 2.5, gord: 0.5 }
     ];
 
-    // Variáveis Globais de Estado do app
     let metas = { calorias: 0, carb: 0, prot: 0, gord: 0 };
     let consumido = { calorias: 0, carb: 0, prot: 0, gord: 0, agua: 0 };
     let diarioItens = [];
 
-    // Definir data de hoje na tela
     document.getElementById('txt-data-atual').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    // Preencher o select de alimentos ao carregar a página
     const selectAlimento = document.getElementById('select-alimento');
     tabelaAlimentos.forEach(alimento => {
         let opt = document.createElement('option');
@@ -202,3 +194,13 @@
 
     function calcularMetas() {
         const peso = parseFloat(document.getElementById('peso').value);
+        const altura = parseFloat(document.getElementById('altura').value);
+        const idade = parseInt(document.getElementById('idade').value);
+        const sexo = document.getElementById('sexo').value;
+        const atividade = parseFloat(document.getElementById('atividade').value);
+        const objetivo = document.getElementById('objetivo').value;
+
+        if (!peso || !altura || !idade) {
+            alert("Preencha todos os campos!");
+            return;
+        }
