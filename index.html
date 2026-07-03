@@ -31,8 +31,6 @@
         input:focus, select:focus { border-color: var(--primary); }
         button { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
         button:hover { background: #1A365D; }
-        .btn-secondary { background: var(--text-light); margin-top: 10px; }
-        .btn-secondary:hover { background: #4A5568; }
 
         /* Dashboard e Barras de Progresso */
         .grid-macros { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px; }
@@ -107,13 +105,11 @@
                 <option value="ganhar">Ganhar Massa</option>
             </select>
         </div>
-        <button onclick="calcularMetas()">Salvar e Calcular</button>
+        <button id="btn-calcular" onclick="calcularMetas()">Salvar e Calcular</button>
     </div>
 
     <!-- TELA 2: DASHBOARD PRINCIPAL -->
     <div id="secao-dashboard" class="hidden">
-        
-        <!-- Resumo de Metas Calculadas -->
         <div class="card" style="background: #EDF2F7; font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
             <div><b>Seu IMC:</b> <span id="val-imc">-</span></div>
             <div><b>TMB:</b> <span id="val-tmb">-</span> kcal</div>
@@ -121,7 +117,6 @@
             <div style="cursor:pointer; color:var(--primary); font-weight:bold;" onclick="refazerCadastro()">[Alterar Dados]</div>
         </div>
 
-        <!-- Consumo do Dia -->
         <div class="card">
             <h2>Resumo do Dia</h2>
             <div class="progress-container calorias">
@@ -146,12 +141,11 @@
             </div>
         </div>
 
-        <!-- Adicionar Alimentos -->
         <div class="card">
             <h2>Adicionar Alimento</h2>
             <div class="form-group">
                 <label>Selecionar Alimento</label>
-                <select id="select-alimento"></select> <!-- Fechado Corretamente Aqui -->
+                <select id="select-alimento"></select>
             </div>
             <div class="form-group">
                 <label>Quantidade consumida (em gramas)</label>
@@ -160,7 +154,6 @@
             <button onclick="adicionarAlimentoDia()">Registrar Alimento</button>
         </div>
 
-        <!-- Lista de Consumo -->
         <div class="card">
             <h2>Alimentos Consumidos Hoje</h2>
             <div id="lista-consumo"></div>
@@ -169,6 +162,12 @@
 </div>
 
 <script>
+    // Garantir carregamento seguro
+    window.onerror = function(msg, url, linenumber) {
+        alert('Erro detectado no código: ' + msg + '\\nLinha: ' + linenumber);
+        return true;
+    };
+
     const tabelaAlimentos = [
         { id: 1, nome: "Arroz Integral Cozido", cal: 112, carb: 24, prot: 2.6, gord: 0.5 },
         { id: 2, nome: "Feijão Carioca Cozido", cal: 76, carb: 14, prot: 4.8, gord: 0.5 },
@@ -182,25 +181,27 @@
     let consumido = { calorias: 0, carb: 0, prot: 0, gord: 0, agua: 0 };
     let diarioItens = [];
 
-    document.getElementById('txt-data-atual').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    // Tentar rodar as configurações iniciais com segurança
+    try {
+        document.getElementById('txt-data-atual').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    const selectAlimento = document.getElementById('select-alimento');
-    tabelaAlimentos.forEach(alimento => {
-        let opt = document.createElement('option');
-        opt.value = alimento.id;
-        opt.innerText = `${alimento.nome} (${alimento.cal} kcal/100g)`;
-        selectAlimento.appendChild(opt);
-    });
+        const selectAlimento = document.getElementById('select-alimento');
+        tabelaAlimentos.forEach(alimento => {
+            let opt = document.createElement('option');
+            opt.value = alimento.id;
+            opt.innerText = alimento.nome + ' (' + alimento.cal + ' kcal/100g)';
+            selectAlimento.appendChild(opt);
+        });
+    } catch(e) {
+        alert('Erro ao carregar elementos da página: ' + e.message);
+    }
 
     function calcularMetas() {
-        const peso = parseFloat(document.getElementById('peso').value);
-        const altura = parseFloat(document.getElementById('altura').value);
-        const idade = parseInt(document.getElementById('idade').value);
-        const sexo = document.getElementById('sexo').value;
-        const atividade = parseFloat(document.getElementById('atividade').value);
-        const objetivo = document.getElementById('objetivo').value;
+        try {
+            const peso = parseFloat(document.getElementById('peso').value);
+            const altura = parseFloat(document.getElementById('altura').value);
+            const idade = parseInt(document.getElementById('idade').value);
+            const sexo = document.getElementById('sexo').value;
+            const atividade = parseFloat(document.getElementById('atividade').value);
+            const objetivo = document.getElementById('objetivo').value;
 
-        if (!peso || !altura || !idade) {
-            alert("Preencha todos os campos!");
-            return;
-        }
