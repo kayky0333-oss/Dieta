@@ -100,7 +100,7 @@
                 <option value="ganhar">Ganhar Massa</option>
             </select>
         </div>
-        <button id="btn-calcular">Salvar e Calcular</button>
+        <button id="btn-calcular" onclick="calcularMetas()">Salvar e Calcular</button>
     </div>
 
     <!-- TELA 2 -->
@@ -109,7 +109,7 @@
             <div><b>Seu IMC:</b> <span id="val-imc">-</span></div>
             <div><b>TMB:</b> <span id="val-tmb">-</span> kcal</div>
             <div><b>Gasto Diário:</b> <span id="val-tdee">-</span> kcal</div>
-            <div style="cursor:pointer; color:var(--primary); font-weight:bold;" id="btn-refazer">[Alterar Dados]</div>
+            <div style="cursor:pointer; color:var(--primary); font-weight:bold;" onclick="refazerCadastro()">[Alterar Dados]</div>
         </div>
 
         <div class="card">
@@ -131,8 +131,8 @@
             </div>
 
             <div class="water-control">
-                <button id="btn-agua-250" class="water-btn">+ 250ml Água</button>
-                <button id="btn-agua-500" class="water-btn">+ 500ml Água</button>
+                <button class="water-btn" onclick="adicionarAgua(250)">+ 250ml Água</button>
+                <button class="water-btn" onclick="adicionarAgua(500)">+ 500ml Água</button>
             </div>
         </div>
 
@@ -146,7 +146,7 @@
                 <label>Quantidade consumida (g)</label>
                 <input type="number" id="qtd-alimento" value="100">
             </div>
-            <button id="btn-add-alimento">Registrar Alimento</button>
+            <button onclick="adicionarAlimentoDia()">Registrar Alimento</button>
         </div>
 
         <div class="card">
@@ -157,51 +157,55 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const tabelaAlimentos = [
-            { id: 1, nome: "Arroz Integral Cozido", cal: 112, carb: 24, prot: 2.6, gord: 0.5 },
-            { id: 2, nome: "Feijão Carioca Cozido", cal: 76, carb: 14, prot: 4.8, gord: 0.5 },
-            { id: 3, nome: "Peito de Frango Grelhado", cal: 159, carb: 0, prot: 32, gord: 2.5 },
-            { id: 4, nome: "Ovo Cozido", cal: 78, carb: 0.6, prot: 6, gord: 5 },
-            { id: 5, nome: "Banana Prata", cal: 89, carb: 23, prot: 1.3, gord: 0.3 }
-        ];
+    const tabelaAlimentos = [
+        { id: 1, nome: "Arroz Integral Cozido", cal: 112, carb: 24, prot: 2.6, gord: 0.5 },
+        { id: 2, nome: "Feijão Carioca Cozido", cal: 76, carb: 14, prot: 4.8, gord: 0.5 },
+        { id: 3, nome: "Peito de Frango Grelhado", cal: 159, carb: 0, prot: 32, gord: 2.5 },
+        { id: 4, nome: "Ovo Cozido", cal: 78, carb: 0.6, prot: 6, gord: 5 },
+        { id: 5, nome: "Banana Prata", cal: 89, carb: 23, prot: 1.3, gord: 0.3 }
+    ];
 
-        let metas = { calorias: 0, carb: 0, prot: 0, gord: 0 };
-        let consumido = { calorias: 0, carb: 0, prot: 0, gord: 0, agua: 0 };
-        let diarioItens = [];
+    let metas = { calorias: 0, carb: 0, prot: 0, gord: 0 };
+    let consumido = { calorias: 0, carb: 0, prot: 0, gord: 0, agua: 0 };
+    let diarioItens = [];
 
-        document.getElementById('txt-data-atual').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('txt-data-atual').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-        const selectAlimento = document.getElementById('select-alimento');
-        tabelaAlimentos.forEach(alimento => {
-            let opt = document.createElement('option');
-            opt.value = alimento.id;
-            opt.innerText = alimento.nome + ' (' + alimento.cal + ' kcal/100g)';
-            selectAlimento.appendChild(opt);
-        });
+    const selectAlimento = document.getElementById('select-alimento');
+    tabelaAlimentos.forEach(alimento => {
+        let opt = document.createElement('option');
+        opt.value = alimento.id;
+        opt.innerText = alimento.nome + ' (' + alimento.cal + ' kcal/100g)';
+        selectAlimento.appendChild(opt);
+    });
 
-        document.getElementById('btn-calcular').addEventListener('click', function() {
-            const peso = parseFloat(document.getElementById('peso').value);
-            const altura = parseFloat(document.getElementById('altura').value);
-            const idade = parseInt(document.getElementById('idade').value);
-            const sexo = document.getElementById('sexo').value;
-            const atividade = parseFloat(document.getElementById('atividade').value);
-            const objetivo = document.getElementById('objetivo').value;
+    function calcularMetas() {
+        const peso = parseFloat(document.getElementById('peso').value);
+        const altura = parseFloat(document.getElementById('altura').value);
+        const idade = parseInt(document.getElementById('idade').value);
+        const sexo = document.getElementById('sexo').value;
+        const atividade = parseFloat(document.getElementById('atividade').value);
+        const objetivo = document.getElementById('objetivo').value;
 
-            if (!peso || !altura || !idade) {
-                alert("Preencha todos os campos!");
-                return;
-            }
+        if (!peso || !altura || !idade) {
+            alert("Preencha todos os campos!");
+            return;
+        }
 
-            const imc = peso / ((altura / 100) * (altura / 100));
-            document.getElementById('val-imc').innerText = imc.toFixed(1);
+        const imc = peso / ((altura / 100) * (altura / 100));
+        document.getElementById('val-imc').innerText = imc.toFixed(1);
 
-            let tmb = sexo === 'M' ? 
-                66.47 + (13.75 * peso) + (5.0 * altura) - (6.75 * idade) : 
-                655.1 + (9.56 * peso) + (1.85 * altura) - (4.67 * idade);
-            
-            document.getElementById('val-tmb').innerText = Math.round(tmb);
-            let tdee = tmb * atividade;
-            document.getElementById('val-tdee').innerText = Math.round(tdee);
+        let tmb = sexo === 'M' ? 
+            66.47 + (13.75 * peso) + (5.0 * altura) - (6.75 * idade) : 
+            655.1 + (9.56 * peso) + (1.85 * altura) - (4.67 * idade);
+        
+        document.getElementById('val-tmb').innerText = Math.round(tmb);
+        let tdee = tmb * atividade;
+        document.getElementById('val-tdee').innerText = Math.round(tdee);
 
-            if (objetivo === 'emagrecer') metas.calorias = tdee - 400;
+        if (objetivo === 'emagrecer') metas.calorias = tdee - 400;
+        else if (objetivo === 'ganhar') metas.calorias = tdee + 300;
+        else metas.calorias = tdee;
+        
+        metas.calorias = Math.round(metas.calorias);
+        metas.prot = Math.round(peso * 2);
